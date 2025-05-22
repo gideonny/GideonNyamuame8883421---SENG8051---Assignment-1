@@ -44,6 +44,7 @@ Console.WriteLine(Environment.NewLine + $"Enjoy! Please take good care of {petNa
 Console.WriteLine($"Interact with {petName}, your pet {petType.ToLower()}, by pressing the number that corresponds to the menu option you want. Remember to check {petName}'s status often to ensure you are taking good care of them! Every action affects {petName}'s hunger, health, and happiness. Make sure they don't get too hungry or sad, and most importantly, keep them in good health. Enjoy!" + Environment.NewLine);
 
 DateTime timeOfDay = DateTime.Today.AddHours(8); // Start at 8 AM
+bool skipTimeUpdate = false; // to skip time update for 2 hour rest
 
 // Pet stats
 int hunger = 5;
@@ -58,13 +59,14 @@ Console.WriteLine("Menu:");
 Console.WriteLine($"1. Feed {petName}");
 Console.WriteLine($"2. Play with {petName}");
 Console.WriteLine($"3. Let {petName} rest");
-Console.WriteLine($"4. Check {petName}'s status");
-Console.WriteLine("5. Exit" + Environment.NewLine);
+Console.WriteLine($"4. Do nothing");
+Console.WriteLine($"5. Check {petName}'s status");
+Console.WriteLine("6. Exit" + Environment.NewLine);
 
 string menuChoice = Console.ReadLine();
 
 // Main loop
-while (menuChoice != "5")
+while (menuChoice != "6")
 {
     switch (menuChoice)
     {
@@ -101,13 +103,19 @@ while (menuChoice != "5")
             break;
 
         case "3":
-            Console.WriteLine($"{petName} is resting.");
-            hunger += 1;
-            happiness -= 1;
-            health += 4;
+            Console.WriteLine($"{petName} is resting for two hours.");
+            timeOfDay = timeOfDay.AddHours(2);  // Advance 2 hours for rest
+            hunger += 2;       
+            happiness -= 2;    
+            health += 6;      
+            skipTimeUpdate = true;  // <-- SET FLAG HERE
             break;
 
         case "4":
+            Console.WriteLine($"You chose to do nothing. {petName} had an uneventful hour.");
+            break;
+
+        case "5":
             Console.WriteLine($"{petName}'s status:");
             Console.WriteLine($"Hunger: {hunger}");
             Console.WriteLine($"Happiness: {happiness}");
@@ -151,9 +159,15 @@ while (menuChoice != "5")
         Console.WriteLine($"{petName} is feeling very sad.");
 
     // Advance time
-    timeOfDay = timeOfDay.AddHours(1);
-    hunger += 1;
-    happiness -= 1;
+    if (!skipTimeUpdate)
+    {
+        timeOfDay = timeOfDay.AddHours(1);
+        hunger += 1;
+        happiness -= 1;
+    }
+
+    // Reset the flag for next iteration
+    skipTimeUpdate = false; 
 
     // Cap again after time update
     if (hunger > 10) hunger = 10;
@@ -180,16 +194,17 @@ while (menuChoice != "5")
         }
     }
 
-    // Recap after time-based updates
+
     Console.WriteLine(Environment.NewLine + $"Time is now: {timeOfDay:hh:mm tt}");
 
     // Show menu again
-    Console.WriteLine(Environment.NewLine + "Menu:");
+    Console.WriteLine("Menu:");
     Console.WriteLine($"1. Feed {petName}");
     Console.WriteLine($"2. Play with {petName}");
     Console.WriteLine($"3. Let {petName} rest");
-    Console.WriteLine($"4. Check {petName}'s status");
-    Console.WriteLine("5. Exit" + Environment.NewLine);
+    Console.WriteLine($"4. Do nothing");
+    Console.WriteLine($"5. Check {petName}'s status");
+    Console.WriteLine("6. Exit" + Environment.NewLine);
 
     menuChoice = Console.ReadLine();
 }
